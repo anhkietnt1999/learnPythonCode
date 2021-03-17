@@ -8,36 +8,50 @@ import  json
 def CrawlDataPage(soup):
 
     dataAll = []
-    dataTitle = []
+    dataStory = []
     dataSite = []
     dataRank = []
     Ranks = soup.find_all('span',class_='rank')
     for rank in Ranks:
         tempstr = rank.string.replace('.','')
         dataRank.append(tempstr)
-    Titles = soup.find_all('a',class_="storylink")
+        print(tempstr)
+    Titles = soup.find_all('td',class_="title")
     for title in Titles:
-        dataTitle.append({
-            'link': title['href'],
-            'content': title.string
-        })
-    Sitebits = soup.find_all('span', class_='sitebit comhead')
-    for site in Sitebits:
-        dataSite.append({
-           'sitelink': (site.a['href']),
-            'sitestr':(site.span.string)
-        })
-    count =0
+        storylink = title.find('a', class_='storylink')
+        if (storylink == None):
+            dataStory.append({
+                'link': None,
+                'story': None
+            })
+        else:
 
+            dataStory.append({
+                'link': storylink['href'],
+                'story': storylink.string
+            })
+        sitebit = title.find('span', class_='sitebit comhead')
+        if (sitebit == None):
+            dataSite.append({
+                'sitelink': None,
+                'sitestr': None
+            })
+        else:
+           dataSite.append({
+               'sitelink': sitebit.a['href'],
+               'sitestr': sitebit.span.string
+           })
 
-    while (count<len(Ranks)):
+    count = 0
+
+    while (count < len(Ranks)):
         dataAll.append({
-             'Rank':dataRank[count],
-            'TitleClass' : dataTitle[count],
-            'SiteComhead':dataSite[count]
+            'Rank': dataRank[count],
+            'TitleClass': dataStory[count],
+            'SiteComhead': dataSite[count]
 
         })
-        count+=1
+        count += 1
 
     return dataAll
 
@@ -103,35 +117,35 @@ def CrawlDataSubtext(soup):
                 'hide_link': hide['href'],
                 'hide_string': hide.string
             })
-
-        comment = sub.find("a", href=re.compile("item?"))
-        if(comment == None):
+        preComment = hide.next_sibling
+        comment =preComment.next_sibling
+        if (comment == None):
             dataCom.append({
                 'comment_link': None,
                 'comment': None
             })
-
         else:
             dataCom.append({
                 'comment_link': comment['href'],
                 'comment': unicodedata.normalize("NFKD", comment.string)
             })
-    count = 0
-    while (count < len(dataHide)):
-        dataAll.append({
-            'Score':dataScore[count],
-            'Users': dataUser[count],
-            'Ages': dataAge[count],
-            'Hides':dataHide[count],
-            'Comments':dataCom[count]
+        count = 0
+        while (count < len(dataHide)):
+            dataAll.append({
+                'Score': dataScore[count],
+                'Users': dataUser[count],
+                'Ages': dataAge[count],
+                'Hides': dataHide[count],
+                'Comments': dataCom[count]
 
-        })
+            })
 
-        count += 1
+            count += 1
 
-    return  dataAll
+    return dataAll
 
-page = 1
+
+page = 2
 
 while (page <3):
 
@@ -157,8 +171,8 @@ while (page <3):
         print('\n')
         print('------------')
         myjson = total
-        sname = "dearticle-"+ (total['TITLE'])['Rank']+".txt"
+        sname = "rearticle-"+ (total['TITLE'])['Rank']+".txt"
         with open(sname, 'a+') as myfile:
-         json.dump(myjson, myfile)
+        json.dump(myjson, myfile)
 
     page+=1
