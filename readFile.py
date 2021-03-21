@@ -4,7 +4,7 @@ import	MySQLdb
 
 db= None
 f1	=	open('dearticle-9.txt',	'r')
-data	=	f1.read();
+data	=	f1.read()
 line1 = f1.readline()
 jsonstr = json.loads(data)
 
